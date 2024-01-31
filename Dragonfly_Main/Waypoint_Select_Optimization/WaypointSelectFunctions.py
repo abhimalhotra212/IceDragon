@@ -74,7 +74,8 @@ def getSoundingDataAndTargetCoord(opt, useCustomWaypoints):
     wind_speed=[]
 
     #read sounding file and extract data
-    with open ("NASA_files/sounding.txt", "r") as f:
+ #   with open ("NASA_files/sounding.txt", "r") as f: 
+    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
         
         # MAKE SURE FORMAT IS SAME AS EXAMPLES
         next(f)
@@ -100,7 +101,8 @@ def getSoundingDataAndTargetCoord(opt, useCustomWaypoints):
     longitude = []
 
     #read target coordinate and extract data
-    targetFileName = "NASA_files/targets.txt"
+#    targetFileName = "NASA_files/targets.txt"
+    targetFileName = "Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/targets.txt"
 
     with open (targetFileName, "r") as f:
 
@@ -152,7 +154,8 @@ def getPredictedTrajectory():
     predictedTrajectory = []
 
     #read predicted trajectory and extract data
-    with open ("descentTrajectoryPrediction/predictedTrajectory.dat", "r") as f:
+#    with open ("descentTrajectoryPrediction/predictedTrajectory.dat", "r") as f:
+    with open ("Dragonfly_Main/Waypoint_Select_Optimization/descentTrajectoryPrediction/predictedTrajectory.dat", "r") as f:
         next(f)
         predictedTrajectoryRaw = f.read().split('\n')
         for i in predictedTrajectoryRaw:
@@ -299,7 +302,7 @@ def simulate(altitude, wind_velocity, predictedTrajectory, waypoints, initialPos
             ax.quiver(xPositionSounding, yPositionSounding, zPositionSounding, soundingArrayX, soundingArrayY, 0, length = 500, color = 'orange')
         '''
     # comment out plotted things 
-    plt.show()
+#    plt.show()
 
     return np.array(waypointSuccesses)
 

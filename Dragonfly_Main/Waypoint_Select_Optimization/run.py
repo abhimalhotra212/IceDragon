@@ -4,7 +4,7 @@
 #import statement
 import WaypointSelectFunctions as dff
 import numpy as np
-from dronekit import connect
+#from dronekit import connect
 
 
 """
