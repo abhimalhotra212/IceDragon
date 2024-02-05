@@ -31,12 +31,16 @@ def get_altitude_BME():
     '''
     get altitude data from bme sensor
     '''
-    
+
 def set_waypoints():
     '''
     kayla's waypoint algorithm used here
     '''
 
+def check_inside_radius():
+    '''
+    check if inside designated radius of target to loiter about
+    '''
 def check_systems():
     '''
     check heating system and gps data, 
