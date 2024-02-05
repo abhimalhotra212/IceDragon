@@ -42,7 +42,7 @@ while deployed:
     '''
     if check_wind_speed(altitude):
         break
-    time.sleep(1)
+    time.sleep(.1)
 
 while glide:
     waypoints = ice.set_waypoints()
@@ -83,6 +83,8 @@ while loiter:
         print("Chute Deployed")
     
     time.sleep(2)
+
+    
     
 
 
