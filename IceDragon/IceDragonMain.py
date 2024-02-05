@@ -17,6 +17,7 @@ deployed = False
 dive = False
 mounted = False
 glide = False
+loiter = False
 
 
 while mounted:
@@ -31,6 +32,7 @@ while mounted:
         deploy node
         get current position
     '''
+    time.sleep(1)
 
 while deployed:
     altitude = ice.get_altitude()
@@ -40,16 +42,47 @@ while deployed:
     '''
     if check_wind_speed(altitude):
         break
+    time.sleep(1)
 
 while glide:
     waypoints = ice.set_waypoints()
     cmds = vehicle.commands
     cmds.clear()
     
+    # not correct, fix this
     for i in waypoints:
-        cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT))
+        cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0))
 
+    print("Uploading commands to vehicle")
+    cmds.upload()
+    print("Commands uploaded")
+
+    # arming the vehicle
+    vehicle.armed = True
+
+    # Setting mode to execute mission
     vehicle.Mode = ("AUTO")
+
+    # check if we have lat long data, heating system is working etc.
+    ice.checkSystems()
+
+    if ice.get_location(vehicle):
+        '''
+        generate function to check if within radius of waypoint
+        '''
+        loiter = True
+        glide = False
+        break
+
+while loiter:
+    # explore guided mode; how to set value to loiter about
+    # right now, Loiter means loiter around point where mode switched
+    vehicle.Mode = ("Loiter")
+    if ice.get_altitude(vehicle) < 500:
+        ice.chuteDeploy(vehicle)
+        print("Chute Deployed")
+    
+    time.sleep(2)
     
 
 
