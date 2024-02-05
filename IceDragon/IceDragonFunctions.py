@@ -24,7 +24,14 @@ def get_altitude(vehicle, bme):
     altitude_bme = get_altitude_BME()
 
     # averaging the altitudes for now, need to test accuracy of either sensor
-    altitude = (altitude_gps + altitude_bme) / 2
+    # seeing if gps altitude is within 20 meters of bme sensor
+    if altitude_gps < altitude_bme - 20 & altitude_gps > altitude_bme + 20:
+        altitude = (altitude_gps + altitude_bme) / 2
+        
+        return altitude
+    else:
+        return altitude_bme
+    
 
 
 def get_altitude_BME():

@@ -78,10 +78,12 @@ while loiter:
     # explore guided mode; how to set value to loiter about
     # right now, Loiter means loiter around point where mode switched
     vehicle.Mode = ("Loiter")
-    if ice.get_altitude(vehicle) < 500:
+
+    # deploying chute if vehicle is ~3000 meters above ground level
+    if ice.get_altitude(vehicle) < 3000:
 
         ice.deploy_chute(vehicle)
-        
+
         print("Chute Deployed")
     
     time.sleep(2)
