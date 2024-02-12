@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
-
+import math
+import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
 
@@ -13,7 +14,35 @@ def deployNode(vehicle):
 def check_wind_speed():
     '''
     use sounding data file to get wind speeds at given altitude
+
+    code is something like...
     '''
+    # Initialize Lists
+    alt = [] # altitude from sounding file
+    wind_drc = [] # wind direction from sounding file
+    wind_speed = [] # wind speed from sounding file
+
+    # Read Sounding File
+    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
+        
+        # WILL NEED TO CHECK FORMAT OF NEW SOUNDING FILE!!
+        next(f)
+        winds_aloft = f.read().split('\n')
+        for i in winds_aloft:
+            array = i.split("\t")
+            #Handling NaN value in dataset
+            if len(array) < 5:
+                continue
+            alt.append(float(array[1]))
+            wind_drc.append(float(array[2]))
+            wind_speed.append(float(array[3]))
+
+    # Conversion
+    alt = np.array(alt) * 0.3048 # [m]
+    wind_drc = np.array(wind_drc) # [deg]
+    wind_speed = np.array(wind_speed) * 0.514 # [m/s]
+
+    return alt, wind_drc, wind_speed
 
 def get_altitude(vehicle, bme):
     altitude_gps = 0
@@ -39,10 +68,53 @@ def get_altitude_BME():
     get altitude data from bme sensor
     '''
 
-def set_waypoints():
+def set_waypoints(alt):
     '''
     kayla's waypoint algorithm used here
+
+    parameter: alt - altitudes from sounding data
+    returns: 3 waypoints (lat, lon, alt), target (lat, lon, alt), and altitude above target where we begin loiter
     '''
+
+    # starting coordinates
+    #nodegps = vehicle.location.global_frame
+    lat1 = float(-105) #float(nodegps.lat)
+    lon1 = float(36) #float(nodegps.lon)
+    alt1 = float(1200) #float(nodegps.alt)
+    # target coordinates
+    lat2 = float(-109)
+    lon2 = float(30)
+    alt2 = float(300)
+
+    # glide angle
+    glide = float(30)
+    angle = glide * np.pi / 180 # convert degrees to radians
+    # calculate distance between starting and target location with Haversine Formula
+    dlon = math.radians(lon2 - lon1)
+    dlat = math.radians(lat2 - lat1)
+    a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    r = 6371.1370 # radius of Earth in km 
+    flat_dist = c * r
+    # some trig
+    delta_h = flat_dist * math.tan(angle)
+    alt_above = alt1 - delta_h # altitude above target coords
+
+    # Waypoints    
+    lat_wp = []
+    lon_wp = []
+    alt_wp = []
+    point_num = 3
+    for i in range(1, point_num + 1):
+        ratio = i / (point_num + 1)
+        lat = lat1 + ratio * (lat2 - lat1)
+        lon = lon1 + ratio * (lon2 - lon1)
+        alt = alt1 + ratio * (alt_above - alt1)
+        lat_wp.append(lat)
+        lon_wp.append(lon)
+        alt_wp.append(alt)
+
+    return lat_wp, lon_wp, alt_wp, lat2, lon2, alt2, alt_above    
 
 def check_inside_radius():
     '''
