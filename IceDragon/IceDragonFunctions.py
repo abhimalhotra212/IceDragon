@@ -44,6 +44,7 @@ def check_wind_speed():
 
     return alt, wind_drc, wind_speed
 
+
 def get_altitude(vehicle, bme):
     altitude_gps = 0
     altitude_bme = 0
@@ -68,6 +69,19 @@ def get_altitude_BME():
     get altitude data from bme sensor
     '''
 
+def haversine_formula(lat1, lon1, lat2, lon2):
+    '''
+    calculates distance between two lat/lon coordinates using Haversine Formula
+    '''
+    dlon = math.radians(lon2 - lon1)
+    dlat = math.radians(lat2 - lat1)
+    a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    r = 6371.1370 # radius of Earth in km 
+    
+    return c * r * 1000 # returns distance in meters
+
+
 def set_waypoints(alt):
     '''
     kayla's waypoint algorithm used here
@@ -89,13 +103,8 @@ def set_waypoints(alt):
     # glide angle
     glide = float(30)
     angle = glide * np.pi / 180 # convert degrees to radians
-    # calculate distance between starting and target location with Haversine Formula
-    dlon = math.radians(lon2 - lon1)
-    dlat = math.radians(lat2 - lat1)
-    a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    r = 6371.1370 # radius of Earth in km 
-    flat_dist = c * r
+    # calculate distance [m] between starting and target location with Haversine Formula
+    flat_dist = haversine_formula(lat1, lon1, lat2, lon2)
     # some trig
     delta_h = flat_dist * math.tan(angle)
     alt_above = alt1 - delta_h # altitude above target coords
@@ -116,10 +125,45 @@ def set_waypoints(alt):
 
     return lat_wp, lon_wp, alt_wp, lat2, lon2, alt2, alt_above    
 
-def check_inside_radius():
+def check_inside_radius(lat2, lon2, vehicle):
     '''
     check if inside designated radius of target to loiter about
+    parameter: lat2 - target latitude, lon2 - target longitude
     '''
+
+    nodegps = vehicle.location.global_frame
+    current_lat = float(nodegps.lat)
+    current_lon = float(nodegps.lon)
+    current_alt = float(nodegps.alt)
+    dist = haversine_formula(current_lat, current_lon, lat2, lon2)
+    radius = 20 # radius around target [m]
+    if dist <= radius:
+        print("Vehicle inside radius")
+    else:
+        print("Vehicle outside radius")
+
+    return
+
+def send_loiter_mission(vehicle, lat2, lon2, alt2, loit_time):
+    '''
+    defines a loiter mission given a target location
+    
+    not sure if correct
+    '''
+    loiter = mavutil.mavlink.MAVLink_mission_item_message(
+        1, 1,  # target system, target component
+        mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
+        mavutil.mavlink.MAV_CMD_NAV_LOITER_TIME,
+        0,  # current
+        0,  # autocontinue
+        0, 0, 0, 
+        loit_time,  # loiter time in seconds
+        0,  # orbit count
+        lat2, lon2, alt2  # latitude, longitude, altitude
+    )
+
+    vehicle.mav.send(loiter)
+
 def check_systems():
     '''
     check heating system and gps data, 
