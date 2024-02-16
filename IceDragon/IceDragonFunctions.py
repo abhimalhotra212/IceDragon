@@ -4,9 +4,6 @@ import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
 
-C_METER = 3.28084
-C_FEET = 1
-
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
 
