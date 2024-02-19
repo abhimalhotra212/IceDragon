@@ -33,7 +33,7 @@ vehicle.parameters['SERVO4_FUNCTION'] = 33 # motor 1
 print("SERVO4 Set - Motor 1")
 
 vehicle.parameters['SERVO5_FUNCTION'] = 34 # motor 2
-print("SERVO5 Set - Motor 1")
+print("SERVO5 Set - Motor 2")
 
 #dff.initializeServos(vehicle)
 
