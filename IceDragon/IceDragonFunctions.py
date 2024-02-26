@@ -178,3 +178,42 @@ def check_systems():
     check heating system and gps data, 
     '''
 
+
+def initialize_servos(vehicle):
+    # --- Initialize Servo Parameters ---
+    vehicle.parameters['SERVO1_FUNCTION'] = 4 # left aileron
+    vehicle.parameters['SERVO1_REVERSED'] = 0
+    print("SERVO1 Set - Left Aileron")
+
+    vehicle.parameters['SERVO2_FUNCTION'] = 4 # right aileron
+    vehicle.parameters['SERVO2_REVERSED'] = 1
+    print("SERVO2 Set - Right Aileron")
+
+    vehicle.parameters['SERVO3_FUNCTION'] = 19 # elevator
+    print("SERVO3 Set - Elevator")
+
+    vehicle.parameters['SERVO4_FUNCTION'] = 0 # rudder (UNSURE needs to be corrected)
+    print("SERVO4 Set - Rudder")
+
+    vehicle.parameters['SERVO5_FUNCTION'] = 0 # parachute (UNSURE needs to be corrected)
+    print("SERVO5 Set - Parachute")
+
+    # Left Aileron
+    vehicle.parameters['SERVO1_MIN'] = 1000
+    vehicle.parameters['SERVO1_MAX'] = 2000
+    vehicle.parameters['SERVO1_TRIM'] = 1500
+
+    # Right Aileron
+    vehicle.parameters['SERVO2_MIN'] = 1000
+    vehicle.parameters['SERVO2_MAX'] = 2000
+    vehicle.parameters['SERVO2_TRIM'] = 1500
+
+    # Elevator
+    vehicle.parameters['SERVO3_MIN'] = 1000
+    vehicle.parameters['SERVO3_MAX'] = 2000
+    vehicle.parameters['SERVO3_TRIM'] = 1500
+
+    # Rudder
+    vehicle.parameters['SERVO4_MIN'] = 1000
+    vehicle.parameters['SERVO4_MAX'] = 2000
+    vehicle.parameters['SERVO4_TRIM'] = 1500
