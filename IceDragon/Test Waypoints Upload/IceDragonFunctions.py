@@ -89,11 +89,10 @@ def haversine_formula(lat1, lon1, lat2, lon2):
     return c * r * 1000 # returns distance in meters
 
 
-def set_waypoints(alt):
+def set_waypoints():
     '''
     kayla's waypoint algorithm used here
 
-    parameter: alt - altitudes from sounding data
     returns: 3 waypoints (lat, lon, alt), target (lat, lon, alt), and altitude above target where we begin loiter
     '''
 
