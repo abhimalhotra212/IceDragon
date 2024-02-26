@@ -3,23 +3,25 @@ import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
-import windData
+from windData import windData
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
 
 
-def check_wind_speed():
+def get_sounding_data(alt):
     '''
-    use sounding data file to get wind speeds at given altitude
+    returns sounding data at current altitude
 
-    code is something like...
+    :param alt: current altitude of vehicle
     '''
     # Initialize Lists
-    alt = [] # altitude from sounding file
-    wind_drc = [] # wind direction from sounding file
-    wind_speed = [] # wind speed from sounding file
-    windData = []
+    pressure = []
+    height = []
+    direction = []
+    speed = []
+    temp = []
+    current_alt = alt * 3.28084 # meters to feet
 
     # Read Sounding File
     with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
@@ -32,24 +34,18 @@ def check_wind_speed():
             #Handling NaN value in dataset
             if len(array) < 5:
                 continue
-            alt.append(float(array[1]))
-            wind_drc.append(float(array[2]))
-            wind_speed.append(float(array[3]))
-            pressure = float(array[0])
-            height = float(array[1])
-            direction = float(array[2])
-            speed = float(array[3])
-            temperature = float(array[4])
-            placeholder = windData(pressure, height, direction, speed, temperature)
-            windData.append(placeholder)
-            
+            pressure.append(float(array[0]))
+            height.append(float(array[1]))
+            direction.append(float(array[2]))
+            speed.append(float(array[3]))
+            temp.append(float(array[4]))
 
-    # Conversion
-    alt = np.array(alt) * 0.3048 # [m]
-    wind_drc = np.array(wind_drc) # [deg]
-    wind_speed = np.array(wind_speed) * 0.514 # [m/s]
+    # Get closest data to current altitude
+    closest = min(height, key=lambda x: abs(x - current_alt))
+    idx = height.index(closest)
+    data = windData(pressure[idx], height[idx], direction[idx], speed[idx], temp[idx])
 
-    return alt, wind_drc, wind_speed
+    return data
 
 
 def get_altitude(vehicle, bme):
