@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import board
 import adafruit_bme680
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
+import windData
 import time
 import IceDragonFunctions as ice
 
@@ -20,6 +21,10 @@ glide = False
 loiter = False
 
 
+'''
+Mounted variable needs to go True when signal is recieved
+'''
+
 while mounted:
     # pseudocode for sitting on gondola
     '''
@@ -34,24 +39,25 @@ while mounted:
     '''
     time.sleep(1)
 
-while deployed:
+while deployed and glide == False:
     altitude = ice.get_altitude()
     '''
     Compare altitude to sounding data file for lower wind speeds ~ 30-40k feet
     Set mode to auto
     '''
     if check_wind_speed(altitude):
+        glide == True
         break
     time.sleep(.1)
 
+
 while glide:
-    waypoints = ice.set_waypoints()
+    lat_wp, lon_wp, alt_wp = ice.set_waypoints()
     cmds = vehicle.commands
     cmds.clear()
-    
-    # not correct, fix this
-    for i in waypoints:
-        cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0))
+
+    for i in range(0, len(lat_wp)):
+        cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, lat_wp[i], lon_wp[i], alt_wp[i]))
 
     print("Uploading commands to vehicle")
     cmds.upload()
@@ -66,19 +72,19 @@ while glide:
     # check if we have lat long data, heating system is working etc.
     ice.checkSystems()
 
-    if ice.get_location(vehicle):
+
+    if ice.check_inside_radius(target_lat, target_lon, vehicle):
         '''
-        generate function to check if within radius of waypoint
+        check if vehicle is within radius of waypoint
         '''
+        vehicle.mode = ("LOITER")
         loiter = True
         glide = False
         break
 
 while loiter:
     # explore guided mode; how to set value to loiter about
-    # right now, Loiter means loiter around point where mode switched
-    vehicle.Mode = ("Loiter")
-
+    # right now, Loiter means loiter around point where mode switchedbm
     # deploying chute if vehicle is ~3000 meters above ground level
     if ice.get_altitude(vehicle) < 3000:
 
@@ -87,8 +93,3 @@ while loiter:
         print("Chute Deployed")
     
     time.sleep(2)
-
-
-    
-
-

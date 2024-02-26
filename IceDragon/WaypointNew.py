@@ -8,6 +8,7 @@ Description: This script displays the path desired by the glider to reach its ta
 Author: Kayla Wojcik
 Date Created: February 5, 2024
 """
+
 # Initialize Sounding File Lists
 alt = [] 
 # read sounding file
@@ -61,24 +62,31 @@ for i in range(1, point_num + 1):
     lon_wp.append(lon)
     alt_wp.append(alt)
 
+lat_wp.append(lat2)
+lon_wp.append(lon2)
+alt_wp.append(alt_above)
+print(lat_wp)
+print(lon_wp)
+print(alt_wp)
+print(alt_above)
+print(len(lat_wp))
+
 # Figure
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.set_xlabel("Longitude [deg]")
-ax.set_ylabel("Latitude [deg]")
-ax.set_zlabel("Altitude [m]")
-# plot waypoints
-for i in range(0, 3):   
-    ax.scatter(lon_wp[i], lat_wp[i], alt_wp[i])
-    ax.text(lon_wp[i], lat_wp[i], alt_wp[i], str(i+2))
-# plot point before loiter
-ax.scatter(lon2, lat2, alt_above)
-ax.text(lon2, lat2, alt_above, str(5))
-# plots starting and target locations
-ax.scatter(lon1, lat1, alt1)
-ax.text(lon1, lat1, alt1, str("start"))
-ax.scatter(lon2, lat2, alt2)
-ax.text(lon2, lat2, alt2, str("target"))
-plt.show()
-
-
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# ax.set_xlabel("Longitude [deg]")
+# ax.set_ylabel("Latitude [deg]")
+# ax.set_zlabel("Altitude [m]")
+# # plot waypoints
+# for i in range(0, 3):   
+#     ax.scatter(lon_wp[i], lat_wp[i], alt_wp[i])
+#     ax.text(lon_wp[i], lat_wp[i], alt_wp[i], str(i+2))
+# # plot point before loiter
+# ax.scatter(lon2, lat2, alt_above)
+# ax.text(lon2, lat2, alt_above, str(5))
+# # plots starting and target locations
+# ax.scatter(lon1, lat1, alt1)
+# ax.text(lon1, lat1, alt1, str("start"))
+# ax.scatter(lon2, lat2, alt2)
+# ax.text(lon2, lat2, alt2, str("target"))
+# plt.show()

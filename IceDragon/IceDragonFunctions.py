@@ -3,6 +3,7 @@ import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
+import windData
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
@@ -18,6 +19,7 @@ def check_wind_speed():
     alt = [] # altitude from sounding file
     wind_drc = [] # wind direction from sounding file
     wind_speed = [] # wind speed from sounding file
+    windData = []
 
     # Read Sounding File
     with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
@@ -33,6 +35,14 @@ def check_wind_speed():
             alt.append(float(array[1]))
             wind_drc.append(float(array[2]))
             wind_speed.append(float(array[3]))
+            pressure = float(array[0])
+            height = float(array[1])
+            direction = float(array[2])
+            speed = float(array[3])
+            temperature = float(array[4])
+            placeholder = windData(pressure, height, direction, speed, temperature)
+            windData.append(placeholder)
+            
 
     # Conversion
     alt = np.array(alt) * 0.3048 # [m]
@@ -120,7 +130,10 @@ def set_waypoints(alt):
         lon_wp.append(lon)
         alt_wp.append(alt)
 
-    return lat_wp, lon_wp, alt_wp, lat2, lon2, alt2, alt_above    
+    lat_wp.append(lat2)
+    lon_wp.append(lon2)
+    alt_wp.append(alt_above)
+    return lat_wp, lon_wp, alt_wp, alt_above    
 
 def check_inside_radius(lat2, lon2, vehicle):
     '''
@@ -133,13 +146,13 @@ def check_inside_radius(lat2, lon2, vehicle):
     current_lon = float(nodegps.lon)
     current_alt = float(nodegps.alt)
     dist = haversine_formula(current_lat, current_lon, lat2, lon2)
-    radius = 20 # radius around target [m]
+    radius = 30 # radius around target [m]
     if dist <= radius:
         print("Vehicle inside radius")
+        return True
     else:
         print("Vehicle outside radius")
-
-    return
+        return False
 
 def send_loiter_mission(vehicle, lat2, lon2, alt2, loit_time):
     '''
@@ -165,3 +178,4 @@ def check_systems():
     '''
     check heating system and gps data, 
     '''
+
