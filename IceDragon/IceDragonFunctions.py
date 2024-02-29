@@ -4,12 +4,50 @@ import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
 import windData
-import board
-import adafruit_bme680
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
 
+
+def uploadSounding():
+    """
+    checks to see if NASA's sounding file is uploaded onto the Pi
+
+    returns visible LED color cue 
+    """
+    # Define the GPIO pins for the red and green LEDs
+    GPIO.setmode(GPIO.BCM)
+    red = 27
+    green = 17
+    # Set up the GPIO pins
+    GPIO.setup(red, GPIO.OUT)
+    GPIO.setup(green, GPIO.OUT)
+
+    file_path = "IceDragon/NASA_sounding.txt"
+    GPIO.output(red, GPIO.HIGH) # turns on red LED
+    time.sleep(2)
+
+    # Check if the file exists
+    if os.path.exists(file_path):
+        GPIO.output(red, GPIO.LOW) # turns off red LED
+        GPIO.output(green, GPIO.HIGH) # turns on green LED
+    else:
+        usb_drive_path = "/media/usb"  # Change to location where USB is actually mounted
+
+        # List files in the USB drive
+        usb_files = os.listdir(usb_drive_path)
+        # Assuming there is only one file on the USB drive
+        if usb_files:
+            source_file = os.path.join(usb_drive_path, usb_files[0])
+            shutil.copy(source_file, file_path)
+            GPIO.output(red, GPIO.LOW) # turns off red LED
+            GPIO.output(green, GPIO.HIGH) # turns on green LED
+
+    time.sleep(5)
+    GPIO.output(green, GPIO.LOW) # turns off green LED
+    GPIO.cleanup()
+
+    return
 
 def get_sounding_data(alt):
     '''
