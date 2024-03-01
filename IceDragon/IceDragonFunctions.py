@@ -25,7 +25,7 @@ def uploadSounding():
     GPIO.setup(red, GPIO.OUT)
     GPIO.setup(green, GPIO.OUT)
 
-    file_path = "IceDragon/NASA_sounding.txt"
+    file_path = "IceDragon/AntSoundingData.txt"
     GPIO.output(red, GPIO.HIGH) # turns on red LED
     time.sleep(2)
 
@@ -51,6 +51,21 @@ def uploadSounding():
 
     return
 
+def avg_data(input_file, output_file):
+        with open(input_file, 'r') as file:
+            # Read lines from the input file
+            lines = file.readlines()
+
+        # Filter numerical data from each line
+        numerical_lines = [line for line in lines if any(char.isdigit() or char in {'-', '.'} for char in line)]
+
+        with open(output_file, 'w') as file:
+            # Write the filtered numerical data back to the file
+            file.writelines(numerical_lines)
+
+        print(f"Numerical data extracted and saved to {output_file}")
+
+
 def get_sounding_data(alt):
     '''
     returns sounding data at current altitude
@@ -66,7 +81,7 @@ def get_sounding_data(alt):
     current_alt = alt * 3.28084 # meters to feet
 
     # Read Sounding File
-    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
+    with open ("IceDragon/AntSoundingData.txt", "r") as f:
         
         # WILL NEED TO CHECK FORMAT OF NEW SOUNDING FILE!!
         next(f)
