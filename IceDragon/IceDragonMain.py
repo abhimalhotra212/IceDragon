@@ -20,10 +20,21 @@ mounted = False
 glide = False
 loiter = False
 
-
 '''
 Mounted variable needs to go True when signal is recieved
 '''
+# --- Mounting ---
+# NEED TO HAVE MOUNTING PINS IN
+GPIO.setmode(GPIO.BCM)     # set up BCM GPIO numbering  
+GPIO.setup(25, GPIO.IN)    # set GPIO25 as input (button)  
+ice.nodeDeploymentTest(vehicle,1500)
+
+
+# NEEDS TO BE CHANGED
+while not mounted:
+    if GPIO.input(25) == GPIO.HIGH: # we need to check to make sure the correct GPIO pin is receiving the signal
+        dff.nodeDeploymentTest(vehicle,2000)
+        mounted = True
 
 while mounted:
     # pseudocode for sitting on gondola
