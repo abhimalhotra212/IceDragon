@@ -3,7 +3,9 @@ import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
-import windData
+import windDataObject as windData
+import os
+import shutil
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
@@ -49,19 +51,18 @@ def uploadSounding():
 
     return
 
-def avg_data(input_file, output_file):
-        with open(input_file, 'r') as file:
-            # Read lines from the input file
-            lines = file.readlines()
+def avg_data():
+    with open("IceDragon/AntSoundingData.txt", 'r') as file:
+        # Read lines from the input file
+        lines = file.readlines()
 
-        # Filter numerical data from each line
-        numerical_lines = [line for line in lines if any(char.isdigit() or char in {'-', '.'} for char in line)]
 
-        with open(output_file, 'w') as file:
-            # Write the filtered numerical data back to the file
-            file.writelines(numerical_lines)
+    # Filter lines containing only numerical data
+    numerical_lines = [line.strip() for line in lines if all(char.isdigit() or char in {'-', '.', ' '} for char in line.strip())]
 
-        print(f"Numerical data extracted and saved to {output_file}")
+    with open("IceDragon/filtered_sounding.txt", 'w') as file:
+        # Write the filtered numerical data back to the file
+        file.write('\n'.join(numerical_lines))
 
 
 def get_sounding_data(alt):
@@ -79,7 +80,7 @@ def get_sounding_data(alt):
     current_alt = alt * 3.28084 # meters to feet
 
     # Read Sounding File
-    with open ("IceDragon/AntSoundingData.txt", "r") as f:
+    with open ("IceDragon/filtered_sounding.txt", "r") as f:
         
         # WILL NEED TO CHECK FORMAT OF NEW SOUNDING FILE!!
         next(f)
@@ -141,7 +142,6 @@ def get_altitude_BME():
     # separate temperature sensor to calibrate this one.
     temperature_offset = -5
 
-    '''
     while True:
         print("\nTemperature: %0.1f C" % (bme680.temperature + temperature_offset))
         print("Gas: %d ohm" % bme680.gas)
@@ -150,9 +150,6 @@ def get_altitude_BME():
         print("Altitude = %0.2f meters" % bme680.altitude)
 
     time.sleep(1)
-    '''
-
-    return bme680.altitude
 
 def haversine_formula(lat1, lon1, lat2, lon2):
     '''
@@ -295,32 +292,3 @@ def initialize_servos(vehicle):
     vehicle.parameters['SERVO4_MIN'] = 1000
     vehicle.parameters['SERVO4_MAX'] = 2000
     vehicle.parameters['SERVO4_TRIM'] = 1500
-
-
-'''
-Create a funciton that jitters the servos (keep them warm) by setting their PWM values to 
-'''
-def jitter(vehicle):
-    i = 0
-    trim = [1380, 1380, 1310, 1310, 2000, 1000]
-    pwm1 = [trim[0]+50, trim[1]+50, trim[2]+50, trim[3]+50, trim[4]-50, trim[5]+50]
-    pwm2 = [trim[0]-50, trim[1]-50, trim[2]-50, trim[3]-50, trim[4], trim[5]]
-    for i in range(0, 6):
-        for k in range (0, 4):
-            msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, k, pwm1[i],0,0,0,0,0)
-            vehicle.send_mavlink(msg)
-            time.sleep(1)
-
-            msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, k, pwm2[i],0,0,0,0,0)
-            vehicle.send_mavlink(msg)
-            time.sleep(1)
-
-'''
-Function that will track airspeed with pitot tube to understand when IceDragon is deployed, work with John to get this
-'''
-
-def get_acceleration(vehicle):
-    return vehicle.acceleration
-
-
-
