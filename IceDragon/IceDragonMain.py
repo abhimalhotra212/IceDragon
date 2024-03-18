@@ -37,7 +37,7 @@ while not mounted:
 
         # conditional for setting mounted to true with acceleration (if acceleration is less than 9 m/s^2 downwards)
         if (ice.get_acceleration(vehicle)[2] > -9):
-            mounted = True
+            deployed = True
 
 while mounted:
     # pseudocode for sitting on gondola
@@ -71,6 +71,9 @@ while deployed and glide == False:
         glide == True
         break
     time.sleep(.1)
+
+    if (ice.get_acceleration(vehicle)[2] < -9):
+            deployed = True
 
 
 while glide:
