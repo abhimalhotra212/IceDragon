@@ -4,6 +4,8 @@ import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
 import windData
+import board
+import adafruit_bme680
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
@@ -305,6 +307,7 @@ Function that will track airspeed with pitot tube to understand when IceDragon i
 '''
 
 def get_acceleration(vehicle):
+    # return an array of the acceleration values x, y, z
     return vehicle.acceleration
 
 
