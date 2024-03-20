@@ -207,7 +207,7 @@ def set_waypoints():
     lat_wp.append(lat2)
     lon_wp.append(lon2)
     alt_wp.append(alt_above)
-    return lat_wp, lon_wp, alt_wp, alt_above    
+    return lat_wp, lon_wp, alt_wp, alt_above
 
 def check_inside_radius(lat2, lon2, vehicle):
     '''

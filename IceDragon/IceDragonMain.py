@@ -15,8 +15,13 @@ i2c = board.I2C()
 bme = adafruit_bme680.Adafruit_BME680_I2C(i2c)
 
 deployed = False
+
+
 dive = False
+
 mounted = False
+
+
 glide = False
 loiter = False
 
@@ -28,38 +33,6 @@ Mounted variable needs to go True when signal is recieved
 GPIO.setmode(GPIO.BCM)     # set up BCM GPIO numbering  
 GPIO.setup(25, GPIO.IN)    # set GPIO25 as input (button)  
 ice.nodeDeploymentTest(vehicle,1500)
-
-
-# NEEDS TO BE CHANGED
-while not mounted:
-    if GPIO.input(25) == GPIO.HIGH: # we need to check to make sure the correct GPIO pin is receiving the signal
-        ice.nodeDeploymentTest(vehicle,2000)
-
-        # conditional for setting mounted to true with acceleration (if acceleration is less than 9 m/s^2 downwards)
-        if (ice.get_acceleration(vehicle)[2] > -9):
-            deployed = True
-
-while mounted:
-    # pseudocode for sitting on gondola
-    '''
-    if pin is inserted
-        mounted = true
-        jitter servos
-        get current position
-    if signal is recieved
-        mounted = false
-        deploy node
-        get current position
-    '''
-
-    if GPIO.input(25) == GPIO.HIGH:
-        ice.jitter(vehicle)
-        mounted = False
-        deployed = True
-        current_location = vehicle.location.global_frame
-
-
-    time.sleep(1)
 
 while deployed and glide == False:
     altitude = ice.get_altitude()
@@ -77,12 +50,14 @@ while deployed and glide == False:
 
 
 while glide:
-    lat_wp, lon_wp, alt_wp = ice.set_waypoints()
+    lat_wp, lon_wp, alt_wp, alt_above = ice.set_waypoints()
     cmds = vehicle.commands
     cmds.clear()
 
     for i in range(0, len(lat_wp)):
         cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, lat_wp[i], lon_wp[i], alt_wp[i]))
+
+    cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_LOITER, 0, 0, 0, 0, 0, 0, lat_wp[i], lon_wp[i], alt_above))
 
     print("Uploading commands to vehicle")
     cmds.upload()
@@ -94,7 +69,7 @@ while glide:
     # Setting mode to execute mission
     vehicle.Mode = ("AUTO")
 
-    # check if we have lat long data, heating system is working etc.
+    # check if we have lat long data, heating system is working etc. need to work on this function
     ice.checkSystems()
 
 
