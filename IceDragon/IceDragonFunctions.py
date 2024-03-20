@@ -99,6 +99,7 @@ def get_sounding_data(alt):
     # Get closest data to current altitude
     closest = min(height, key=lambda x: abs(x - current_alt))
     idx = height.index(closest)
+    print(pressure[idx])
     data = windData(pressure[idx], height[idx], direction[idx], speed[idx], temp[idx])
 
     return data
