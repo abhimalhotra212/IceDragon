@@ -33,8 +33,11 @@ ice.nodeDeploymentTest(vehicle,1500)
 # NEEDS TO BE CHANGED
 while not mounted:
     if GPIO.input(25) == GPIO.HIGH: # we need to check to make sure the correct GPIO pin is receiving the signal
-        dff.nodeDeploymentTest(vehicle,2000)
-        mounted = True
+        ice.nodeDeploymentTest(vehicle,2000)
+
+        # conditional for setting mounted to true with acceleration (if acceleration is less than 9 m/s^2 downwards)
+        if (ice.get_acceleration(vehicle)[2] > -9):
+            deployed = True
 
 while mounted:
     # pseudocode for sitting on gondola
@@ -48,6 +51,14 @@ while mounted:
         deploy node
         get current position
     '''
+
+    if GPIO.input(25) == GPIO.HIGH:
+        ice.jitter(vehicle)
+        mounted = False
+        deployed = True
+        current_location = vehicle.location.global_frame
+
+
     time.sleep(1)
 
 while deployed and glide == False:
@@ -56,10 +67,13 @@ while deployed and glide == False:
     Compare altitude to sounding data file for lower wind speeds ~ 30-40k feet
     Set mode to auto
     '''
-    if check_wind_speed(altitude):
+    if ice.check_wind_speed(altitude):
         glide == True
         break
     time.sleep(.1)
+
+    if (ice.get_acceleration(vehicle)[2] < -9):
+            deployed = True
 
 
 while glide:
