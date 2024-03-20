@@ -4,8 +4,6 @@ import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
 import windData
-import board
-import adafruit_bme680
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
@@ -25,7 +23,7 @@ def uploadSounding():
     GPIO.setup(red, GPIO.OUT)
     GPIO.setup(green, GPIO.OUT)
 
-    file_path = "IceDragon/NASA_sounding.txt"
+    file_path = "IceDragon/AntSoundingData.txt"
     GPIO.output(red, GPIO.HIGH) # turns on red LED
     time.sleep(2)
 
@@ -51,6 +49,20 @@ def uploadSounding():
 
     return
 
+def avg_data():
+    with open("IceDragon/AntSoundingData.txt", 'r') as file:
+        # Read lines from the input file
+        lines = file.readlines()
+
+
+    # Filter lines containing only numerical data
+    numerical_lines = [line.strip() for line in lines if all(char.isdigit() or char in {'-', '.', ' '} for char in line.strip())]
+
+    with open("IceDragon/filtered_sounding.txt", 'w') as file:
+        # Write the filtered numerical data back to the file
+        file.write('\n'.join(numerical_lines))
+
+
 def get_sounding_data(alt):
     '''
     returns sounding data at current altitude
@@ -66,7 +78,7 @@ def get_sounding_data(alt):
     current_alt = alt * 3.28084 # meters to feet
 
     # Read Sounding File
-    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
+    with open ("IceDragon/filtered_sounding.txt", "r") as f:
         
         # WILL NEED TO CHECK FORMAT OF NEW SOUNDING FILE!!
         next(f)
@@ -128,7 +140,6 @@ def get_altitude_BME():
     # separate temperature sensor to calibrate this one.
     temperature_offset = -5
 
-    '''
     while True:
         print("\nTemperature: %0.1f C" % (bme680.temperature + temperature_offset))
         print("Gas: %d ohm" % bme680.gas)
@@ -137,9 +148,6 @@ def get_altitude_BME():
         print("Altitude = %0.2f meters" % bme680.altitude)
 
     time.sleep(1)
-    '''
-
-    return bme680.altitude
 
 def haversine_formula(lat1, lon1, lat2, lon2):
     '''
@@ -307,7 +315,6 @@ Function that will track airspeed with pitot tube to understand when IceDragon i
 '''
 
 def get_acceleration(vehicle):
-    # return an array of the acceleration values x, y, z
     return vehicle.acceleration
 
 

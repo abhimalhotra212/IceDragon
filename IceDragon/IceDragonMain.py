@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import board
 import adafruit_bme680
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
-import windData
+import windDataObject as windData
 import time
 import IceDragonFunctions as ice
 
