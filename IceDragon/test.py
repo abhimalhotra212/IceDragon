@@ -1,4 +1,4 @@
-import windDataObject as windData
+import IceDragon.windData as windData
 import numpy as np
 import re
 
