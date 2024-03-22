@@ -3,7 +3,7 @@ import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
-import windData
+import windData as object
 import board
 import adafruit_bme680
 
@@ -65,24 +65,24 @@ def avg_data():
         file.write('\n'.join(numerical_lines))
 
 
-def get_sounding_data(alt):
-    '''
-    returns sounding data at current altitude
+def getSoundingData(alt):
+    """
+    getSoundingData - read and return all sounding data in an object
 
-    :param alt: current altitude of vehicle
-    '''
-    # Initialize Lists
+    :return: 
+    """ 
+
+    #Initialize lists
     pressure = []
     height = []
-    direction = []
-    speed = []
+    wind_direction = []
+    wind_speed = []
     temp = []
-    current_alt = alt * 3.28084 # meters to feet
+    current_alt = alt * 3.28084 # meters to ft
 
-    # Read Sounding File
-    with open ("IceDragon/filtered_sounding.txt", "r") as f:
+    #read sounding file and extract data
+    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
         
-        # WILL NEED TO CHECK FORMAT OF NEW SOUNDING FILE!!
         next(f)
         winds_aloft = f.read().split('\n')
         for i in winds_aloft:
@@ -92,15 +92,14 @@ def get_sounding_data(alt):
                 continue
             pressure.append(float(array[0]))
             height.append(float(array[1]))
-            direction.append(float(array[2]))
-            speed.append(float(array[3]))
+            wind_direction.append(float(array[2]))
+            wind_speed.append(float(array[3]))
             temp.append(float(array[4]))
 
-    # Get closest data to current altitude
+        # Get closest data to current altitude
     closest = min(height, key=lambda x: abs(x - current_alt))
     idx = height.index(closest)
-    print(pressure[idx])
-    data = windData(pressure[idx], height[idx], direction[idx], speed[idx], temp[idx])
+    data = object.windData(pressure[idx], height[idx], wind_direction[idx], wind_speed[idx], temp[idx])
 
     return data
 
