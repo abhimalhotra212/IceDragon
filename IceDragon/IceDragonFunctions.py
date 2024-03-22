@@ -51,19 +51,6 @@ def uploadSounding():
 
     return
 
-def avg_data():
-    with open("IceDragon/AntSoundingData.txt", 'r') as file:
-        # Read lines from the input file
-        lines = file.readlines()
-
-
-    # Filter lines containing only numerical data
-    numerical_lines = [line.strip() for line in lines if all(char.isdigit() or char in {'-', '.', ' '} for char in line.strip())]
-
-    with open("IceDragon/filtered_sounding.txt", 'w') as file:
-        # Write the filtered numerical data back to the file
-        file.write('\n'.join(numerical_lines))
-
 
 def getSoundingData(alt):
     """
@@ -227,6 +214,7 @@ def check_inside_radius(lat2, lon2, vehicle):
     else:
         print("Vehicle outside radius")
         return False
+
 
 def send_loiter_mission(vehicle, lat2, lon2, alt2, loit_time):
     '''
