@@ -34,6 +34,8 @@ GPIO.setmode(GPIO.BCM)     # set up BCM GPIO numbering
 GPIO.setup(25, GPIO.IN)    # set GPIO25 as input (button)  
 ice.nodeDeploymentTest(vehicle,1500)
 
+
+# NEED to drop the pixhawk and record the actual free fall accelerations values 
 while deployed and glide == False:
     altitude = ice.get_altitude()
     '''
