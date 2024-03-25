@@ -21,8 +21,8 @@ def uploadSounding():
     """
     # Define the GPIO pins for the red and green LEDs
     GPIO.setmode(GPIO.BCM)
-    red = 27
-    green = 17
+    red = 27 # file not on Pi
+    green = 17 # file uploaded to Pi
     # Set up the GPIO pins
     GPIO.setup(red, GPIO.OUT)
     GPIO.setup(green, GPIO.OUT)
@@ -153,19 +153,17 @@ def haversine_formula(lat1, lon1, lat2, lon2):
     return c * r * 1000 # returns distance in meters
 
 
-def set_waypoints():
+def set_waypoints(vehicle):
     '''
-    kayla's waypoint algorithm used here
-
     returns: 3 waypoints (lat, lon, alt), target (lat, lon, alt), and altitude above target where we begin loiter
     '''
 
-    # starting coordinates
-    #nodegps = vehicle.location.global_frame
-    lat1 = float(-105) #float(nodegps.lat)
-    lon1 = float(36) #float(nodegps.lon)
-    alt1 = float(1200) #float(nodegps.alt)
-    # target coordinates
+    # starting coordinates using current GPS data
+    nodegps = vehicle.location.global_frame
+    lat1 = float(nodegps.lat)
+    lon1 = float(nodegps.lon)
+    alt1 = float(nodegps.alt)
+    # target coordinates (NEED TO UPLOAD DATA FROM FILE FOR TARGET!)
     lat2 = float(-109)
     lon2 = float(30)
     alt2 = float(300)
@@ -198,6 +196,7 @@ def set_waypoints():
     alt_wp.append(alt_above)
     return lat_wp, lon_wp, alt_wp, alt_above
 
+
 def check_inside_radius(lat2, lon2, vehicle):
     '''
     check if inside designated radius of target to loiter about
@@ -207,14 +206,13 @@ def check_inside_radius(lat2, lon2, vehicle):
     nodegps = vehicle.location.global_frame
     current_lat = float(nodegps.lat)
     current_lon = float(nodegps.lon)
-    current_alt = float(nodegps.alt)
     dist = haversine_formula(current_lat, current_lon, lat2, lon2)
     radius = 30 # radius around target [m]
     if dist <= radius:
-        print("Vehicle inside radius")
+        print("Vehicle inside radius") # delete after testing
         return True
     else:
-        print("Vehicle outside radius")
+        print("Vehicle outside radius") # delete after testing
         return False
 
 
