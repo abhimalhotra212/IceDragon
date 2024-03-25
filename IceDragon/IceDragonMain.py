@@ -34,15 +34,34 @@ GPIO.setmode(GPIO.BCM)     # set up BCM GPIO numbering
 GPIO.setup(25, GPIO.IN)    # set GPIO25 as input (button)  
 ice.nodeDeploymentTest(vehicle,1500)
 
+while mounted:
+    # will check airspeed and acceleration is not freefall then break
+    if (ice.check_airspeed(vehicle) > 100 or ice.get_acceleration(vehicle) < -9):
+        mounted = False
+        break
+
 
 # NEED to drop the pixhawk and record the actual free fall accelerations values 
+# Have dropped from gondola but not going to target yet (initial descent)
 while deployed and glide == False:
     altitude = ice.get_altitude()
+    
+    # Need to write function to get wind object
+    # Get direction of wind based on altitude and sounding file
+    wind = ice.get_wind(vehicle)
+
+
     '''
     Compare altitude to sounding data file for lower wind speeds ~ 30-40k feet
     Set mode to auto
     '''
-    if ice.check_wind_speed(altitude):
+    # returns wind data at this altitude
+    ice.get_sounding_data(ice.get_altitude(vehicle))
+
+    # compare with wind object from vehicle
+
+    # Exit this loop once we have GPS data
+    if vehicle.gps_0.fix_type != 0:
         glide == True
         break
     time.sleep(.1)
@@ -72,7 +91,10 @@ while glide:
     vehicle.Mode = ("AUTO")
 
     # check if we have lat long data, heating system is working etc. need to work on this function
+    # if we do not have GPS data for prolonged amt of time we need to deploy the chute
     ice.checkSystems()
+
+    # need to always be getting altititude and airspeed (if airspeed exceeds certain value, reduce climb angle)
 
 
     if ice.check_inside_radius(target_lat, target_lon, vehicle):

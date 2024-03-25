@@ -317,6 +317,9 @@ def jitter(vehicle):
 Function that will track airspeed with pitot tube to understand when IceDragon is deployed, work with John to get this
 '''
 
+def check_airspeed(vehicle):
+    return vehicle.airspeed
+
 def get_acceleration(vehicle):
     return vehicle.acceleration
 
