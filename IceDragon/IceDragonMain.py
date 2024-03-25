@@ -39,12 +39,8 @@ while mounted:
 # NEED to drop the pixhawk and record the actual free fall accelerations values 
 # Have dropped from gondola but not going to target yet (initial descent)
 while deployed and glide == False:
-    altitude = ice.get_altitude()
-    
-    # Need to write function to get wind object
-    # Get direction of wind based on altitude and sounding file
-    wind = ice.get_wind(vehicle)
-
+    altitude = ice.get_altitude() # current altitude in meters
+    windObject = ice.getSoundingData(altitude) # object data from sounding file in object
 
     '''
     Compare altitude to sounding data file for lower wind speeds ~ 30-40k feet
