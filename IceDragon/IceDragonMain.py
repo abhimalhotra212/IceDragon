@@ -31,7 +31,7 @@ ice.nodeDeploymentTest(vehicle,1500)
 
 while mounted:
     # will check airspeed and acceleration is not freefall then break
-    if (ice.check_airspeed(vehicle) > 100 or ice.get_acceleration(vehicle) < -9):
+    if (ice.get_airspeed(vehicle) > 100 or ice.get_acceleration(vehicle) < -9):
         mounted = False
         break
 
@@ -40,18 +40,14 @@ while mounted:
 # Have dropped from gondola but not going to target yet (initial descent)
 while deployed and glide == False:
     altitude = ice.get_altitude()
-    
-    # Need to write function to get wind object
-    # Get direction of wind based on altitude and sounding file
-    wind = ice.get_wind(vehicle)
 
+    # Get direction of wind based on altitude and sounding file
+    wind = ice.getSoundingData(ice.get_altitude(vehicle))
 
     '''
     Compare altitude to sounding data file for lower wind speeds ~ 30-40k feet
     Set mode to auto
     '''
-    # returns wind data at this altitude
-    ice.get_sounding_data(ice.get_altitude(vehicle))
 
     # compare with wind object from vehicle
 
@@ -61,6 +57,7 @@ while deployed and glide == False:
         break
     time.sleep(.1)
 
+    # Need to check actual acceleration value
     if (ice.get_acceleration(vehicle)[2] < -9):
             deployed = True
 
