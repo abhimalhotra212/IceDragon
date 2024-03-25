@@ -56,9 +56,7 @@ def uploadSounding():
 
 def getSoundingData(alt):
     """
-    getSoundingData - read and return all sounding data in an object
-
-    :return: 
+    getSoundingData - read and return all sounding data in an object variable
     """ 
 
     #Initialize lists
