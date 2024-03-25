@@ -6,6 +6,8 @@ import time
 import windData as object
 import board
 import adafruit_bme680
+import os 
+import shutil
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
