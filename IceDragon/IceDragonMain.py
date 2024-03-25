@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import board
 import adafruit_bme680
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
-import windDataObject as windData
+import windData as object
 import time
 import IceDragonFunctions as ice
 
@@ -15,13 +15,8 @@ i2c = board.I2C()
 bme = adafruit_bme680.Adafruit_BME680_I2C(i2c)
 
 deployed = False
-
-
 dive = False
-
 mounted = False
-
-
 glide = False
 loiter = False
 
@@ -71,7 +66,7 @@ while deployed and glide == False:
 
 
 while glide:
-    lat_wp, lon_wp, alt_wp, alt_above = ice.set_waypoints()
+    lat_wp, lon_wp, alt_wp, alt_above = ice.set_waypoints(vehicle)
     cmds = vehicle.commands
     cmds.clear()
 
@@ -80,24 +75,20 @@ while glide:
 
     cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_LOITER, 0, 0, 0, 0, 0, 0, lat_wp[i], lon_wp[i], alt_above))
 
-    print("Uploading commands to vehicle")
+    print("Uploading commands to vehicle") # delete after testing
     cmds.upload()
-    print("Commands uploaded")
-
-    # arming the vehicle
-    vehicle.armed = True
+    print("Commands uploaded") # delete after testing
 
     # Setting mode to execute mission
     vehicle.Mode = ("AUTO")
 
     # check if we have lat long data, heating system is working etc. need to work on this function
-    # if we do not have GPS data for prolonged amt of time we need to deploy the chute
     ice.checkSystems()
 
     # need to always be getting altititude and airspeed (if airspeed exceeds certain value, reduce climb angle)
 
 
-    if ice.check_inside_radius(target_lat, target_lon, vehicle):
+    if ice.check_inside_radius(target_lat, target_lon, vehicle) == True:
         '''
         check if vehicle is within radius of waypoint
         '''

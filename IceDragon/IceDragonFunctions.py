@@ -3,9 +3,11 @@ import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
-import windData
+import windData as object
 import board
 import adafruit_bme680
+import os 
+import shutil
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
@@ -19,8 +21,8 @@ def uploadSounding():
     """
     # Define the GPIO pins for the red and green LEDs
     GPIO.setmode(GPIO.BCM)
-    red = 27
-    green = 17
+    red = 27 # file not on Pi
+    green = 17 # file uploaded to Pi
     # Set up the GPIO pins
     GPIO.setup(red, GPIO.OUT)
     GPIO.setup(green, GPIO.OUT)
@@ -51,38 +53,25 @@ def uploadSounding():
 
     return
 
-def avg_data():
-    with open("IceDragon/AntSoundingData.txt", 'r') as file:
-        # Read lines from the input file
-        lines = file.readlines()
 
+def getSoundingData(alt):
+    """
+    getSoundingData - read and return all sounding data in an object
 
-    # Filter lines containing only numerical data
-    numerical_lines = [line.strip() for line in lines if all(char.isdigit() or char in {'-', '.', ' '} for char in line.strip())]
+    :return: 
+    """ 
 
-    with open("IceDragon/filtered_sounding.txt", 'w') as file:
-        # Write the filtered numerical data back to the file
-        file.write('\n'.join(numerical_lines))
-
-
-def get_sounding_data(alt):
-    '''
-    returns sounding data at current altitude
-
-    :param alt: current altitude of vehicle
-    '''
-    # Initialize Lists
+    #Initialize lists
     pressure = []
     height = []
-    direction = []
-    speed = []
+    wind_direction = []
+    wind_speed = []
     temp = []
-    current_alt = alt * 3.28084 # meters to feet
+    current_alt = alt * 3.28084 # meters to ft
 
-    # Read Sounding File
-    with open ("IceDragon/filtered_sounding.txt", "r") as f:
+    #read sounding file and extract data
+    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
         
-        # WILL NEED TO CHECK FORMAT OF NEW SOUNDING FILE!!
         next(f)
         winds_aloft = f.read().split('\n')
         for i in winds_aloft:
@@ -92,15 +81,14 @@ def get_sounding_data(alt):
                 continue
             pressure.append(float(array[0]))
             height.append(float(array[1]))
-            direction.append(float(array[2]))
-            speed.append(float(array[3]))
+            wind_direction.append(float(array[2]))
+            wind_speed.append(float(array[3]))
             temp.append(float(array[4]))
 
-    # Get closest data to current altitude
+        # Get closest data to current altitude
     closest = min(height, key=lambda x: abs(x - current_alt))
     idx = height.index(closest)
-    print(pressure[idx])
-    data = windData(pressure[idx], height[idx], direction[idx], speed[idx], temp[idx])
+    data = object.windData(pressure[idx], height[idx], wind_direction[idx], wind_speed[idx], temp[idx])
 
     return data
 
@@ -165,19 +153,17 @@ def haversine_formula(lat1, lon1, lat2, lon2):
     return c * r * 1000 # returns distance in meters
 
 
-def set_waypoints():
+def set_waypoints(vehicle):
     '''
-    kayla's waypoint algorithm used here
-
     returns: 3 waypoints (lat, lon, alt), target (lat, lon, alt), and altitude above target where we begin loiter
     '''
 
-    # starting coordinates
-    #nodegps = vehicle.location.global_frame
-    lat1 = float(-105) #float(nodegps.lat)
-    lon1 = float(36) #float(nodegps.lon)
-    alt1 = float(1200) #float(nodegps.alt)
-    # target coordinates
+    # starting coordinates using current GPS data
+    nodegps = vehicle.location.global_frame
+    lat1 = float(nodegps.lat)
+    lon1 = float(nodegps.lon)
+    alt1 = float(nodegps.alt)
+    # target coordinates (NEED TO UPLOAD DATA FROM FILE FOR TARGET!)
     lat2 = float(-109)
     lon2 = float(30)
     alt2 = float(300)
@@ -210,6 +196,7 @@ def set_waypoints():
     alt_wp.append(alt_above)
     return lat_wp, lon_wp, alt_wp, alt_above
 
+
 def check_inside_radius(lat2, lon2, vehicle):
     '''
     check if inside designated radius of target to loiter about
@@ -219,15 +206,15 @@ def check_inside_radius(lat2, lon2, vehicle):
     nodegps = vehicle.location.global_frame
     current_lat = float(nodegps.lat)
     current_lon = float(nodegps.lon)
-    current_alt = float(nodegps.alt)
     dist = haversine_formula(current_lat, current_lon, lat2, lon2)
     radius = 30 # radius around target [m]
     if dist <= radius:
-        print("Vehicle inside radius")
+        print("Vehicle inside radius") # delete after testing
         return True
     else:
-        print("Vehicle outside radius")
+        print("Vehicle outside radius") # delete after testing
         return False
+
 
 def send_loiter_mission(vehicle, lat2, lon2, alt2, loit_time):
     '''
