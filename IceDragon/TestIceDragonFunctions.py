@@ -3,11 +3,9 @@ import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
-import windData as object
+import windData
 import board
 import adafruit_bme680
-import os 
-import shutil
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
@@ -53,25 +51,38 @@ def uploadSounding():
 
     return
 
+def avg_data():
+    with open("IceDragon/AntSoundingData.txt", 'r') as file:
+        # Read lines from the input file
+        lines = file.readlines()
 
-def getSoundingData(alt):
-    """
-    getSoundingData - read and return all sounding data in an object
 
-    :return: 
-    """ 
+    # Filter lines containing only numerical data
+    numerical_lines = [line.strip() for line in lines if all(char.isdigit() or char in {'-', '.', ' '} for char in line.strip())]
 
-    #Initialize lists
+    with open("IceDragon/filtered_sounding.txt", 'w') as file:
+        # Write the filtered numerical data back to the file
+        file.write('\n'.join(numerical_lines))
+
+
+def get_sounding_data(alt):
+    '''
+    returns sounding data at current altitude
+
+    :param alt: current altitude of vehicle
+    '''
+    # Initialize Lists
     pressure = []
     height = []
-    wind_direction = []
-    wind_speed = []
+    direction = []
+    speed = []
     temp = []
-    current_alt = alt * 3.28084 # meters to ft
+    current_alt = alt * 3.28084 # meters to feet
 
-    #read sounding file and extract data
-    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
+    # Read Sounding File
+    with open ("IceDragon/filtered_sounding.txt", "r") as f:
         
+        # WILL NEED TO CHECK FORMAT OF NEW SOUNDING FILE!!
         next(f)
         winds_aloft = f.read().split('\n')
         for i in winds_aloft:
@@ -81,14 +92,15 @@ def getSoundingData(alt):
                 continue
             pressure.append(float(array[0]))
             height.append(float(array[1]))
-            wind_direction.append(float(array[2]))
-            wind_speed.append(float(array[3]))
+            direction.append(float(array[2]))
+            speed.append(float(array[3]))
             temp.append(float(array[4]))
 
-        # Get closest data to current altitude
+    # Get closest data to current altitude
     closest = min(height, key=lambda x: abs(x - current_alt))
     idx = height.index(closest)
-    data = object.windData(pressure[idx], height[idx], wind_direction[idx], wind_speed[idx], temp[idx])
+    print(pressure[idx])
+    data = windData(pressure[idx], height[idx], direction[idx], speed[idx], temp[idx])
 
     return data
 
@@ -138,6 +150,10 @@ def get_altitude_BME():
         print("Pressure: %0.3f hPa" % bme680.pressure)
         print("Altitude = %0.2f meters" % bme680.altitude)
 
+        if (input()) :
+            print("Keyboard Input Detected - Break")
+            break
+
     time.sleep(1)
 
 def haversine_formula(lat1, lon1, lat2, lon2):
@@ -162,16 +178,16 @@ def set_waypoints():
 
     # starting coordinates
     #nodegps = vehicle.location.global_frame
-    lat1 = float(-105) #float(nodegps.lat)
-    lon1 = float(36) #float(nodegps.lon)
-    alt1 = float(1200) #float(nodegps.alt)
+    lat1 = input("Enter starting latitude (float): ") #float(nodegps.lat)
+    lon1 = input("Enter starting longitude (float): ") #float(nodegps.lon)
+    alt1 = input("Enter starting altitude (float): ") #float(nodegps.alt)
     # target coordinates
-    lat2 = float(-109)
-    lon2 = float(30)
-    alt2 = float(300)
+    lat2 = input("Enter target latitude (float): ")
+    lon2 = input("Enter target longitude (float): ")
+    alt2 = input("Enter target altitude (float): ")
 
     # glide angle
-    glide = float(30)
+    glide = input("Enter optimal glide angle: ")
     angle = glide * np.pi / 180 # convert degrees to radians
     # calculate distance [m] between starting and target location with Haversine Formula
     flat_dist = haversine_formula(lat1, lon1, lat2, lon2)
@@ -179,7 +195,7 @@ def set_waypoints():
     delta_h = flat_dist * math.tan(angle)
     alt_above = alt1 - delta_h # altitude above target coords
 
-    # Waypoints    
+    # Waypoints
     lat_wp = []
     lon_wp = []
     alt_wp = []
@@ -216,7 +232,6 @@ def check_inside_radius(lat2, lon2, vehicle):
     else:
         print("Vehicle outside radius")
         return False
-
 
 def send_loiter_mission(vehicle, lat2, lon2, alt2, loit_time):
     '''
