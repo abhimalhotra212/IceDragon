@@ -1,11 +1,11 @@
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
-import windData
-import board
-import adafruit_bme680
+#import windData as object
+#import board
+#import adafruit_bme680
 
 def deployNode(vehicle):
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
@@ -50,19 +50,6 @@ def uploadSounding():
     GPIO.cleanup()
 
     return
-
-def avg_data():
-    with open("IceDragon/AntSoundingData.txt", 'r') as file:
-        # Read lines from the input file
-        lines = file.readlines()
-
-
-    # Filter lines containing only numerical data
-    numerical_lines = [line.strip() for line in lines if all(char.isdigit() or char in {'-', '.', ' '} for char in line.strip())]
-
-    with open("IceDragon/filtered_sounding.txt", 'w') as file:
-        # Write the filtered numerical data back to the file
-        file.write('\n'.join(numerical_lines))
 
 
 def get_sounding_data(alt):
@@ -214,23 +201,21 @@ def set_waypoints():
     alt_wp.append(alt_above)
     return lat_wp, lon_wp, alt_wp, alt_above
 
-def check_inside_radius(lat2, lon2, vehicle):
+def check_inside_radius(lat2, lon2):
     '''
     check if inside designated radius of target to loiter about
     parameter: lat2 - target latitude, lon2 - target longitude
     '''
 
-    nodegps = vehicle.location.global_frame
-    current_lat = float(nodegps.lat)
-    current_lon = float(nodegps.lon)
-    current_alt = float(nodegps.alt)
+    #nodegps = vehicle.location.global_frame
+    current_lat = 40.730610#float(nodegps.lat)
+    current_lon = -73.935242#float(nodegps.lon)
+    #current_alt = #float(nodegps.alt)
     dist = haversine_formula(current_lat, current_lon, lat2, lon2)
-    radius = 30 # radius around target [m]
+    radius = 50 # radius around target [m]
     if dist <= radius:
-        print("Vehicle inside radius")
         return True
     else:
-        print("Vehicle outside radius")
         return False
 
 def send_loiter_mission(vehicle, lat2, lon2, alt2, loit_time):
