@@ -21,6 +21,7 @@ glide = False
 loiter = False
 
 while mounted:
+    print('in mounting loop')
     # will check airspeed and acceleration is not freefall then break
     if (ice.get_airspeed(vehicle) > 100 or ice.get_acceleration(vehicle) < -9):
         mounted = False
@@ -45,10 +46,6 @@ while deployed and glide == False:
         break
     time.sleep(.1)
 
-    # Need to check actual acceleration value
-    if (ice.get_acceleration(vehicle)[2] < -9):
-            deployed = True
-
 
 while glide:
     lat_wp, lon_wp, alt_wp, alt_above = ice.set_waypoints(vehicle)
@@ -58,7 +55,7 @@ while glide:
     for i in range(0, len(lat_wp)):
         cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_WAYPOINT, 0, 0, 0, 0, 0, 0, lat_wp[i], lon_wp[i], alt_wp[i]))
 
-    cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_LOITER, 0, 0, 0, 0, 0, 0, lat_wp[i], lon_wp[i], alt_above))
+  #  cmds.add(Command(0, 0, 0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT, mavutil.mavlink.MAV_CMD_NAV_LOITER, 0, 0, 0, 0, 0, 0, lat_wp[i], lon_wp[i], alt_above))
 
     print("Uploading commands to vehicle") # delete after testing
     cmds.upload()

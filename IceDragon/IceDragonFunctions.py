@@ -3,15 +3,12 @@ import math
 import numpy as np
 from dronekit import connect, LocationGlobal, VehicleMode, Command, mavutil
 import time
+#from windData import windData
 import windData as object
 import board
 import adafruit_bme680
 import os 
 import shutil
-
-def deployNode(vehicle):
-    msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, int(CHANNELS['Deployment']), 1000,0, 0, 0, 0, 0)
-
 
 def uploadSounding():
     """
@@ -108,7 +105,6 @@ def get_altitude(vehicle, bme):
     else:
         return altitude_bme
     
-
 
 def get_altitude_BME():
     '''
