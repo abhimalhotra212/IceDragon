@@ -8,7 +8,7 @@ import IceDragonFunctions as ice
 
 # connecting to pixhawk using serial connection in telem2 port
 print("Connecting to Vehicle...")
-vehicle = connect('dev/serial0', wait_ready=True, baud=921600)
+vehicle = connect('/dev/serial0', wait_ready=True, baud=921600)
 print("Connected.")
 
 i2c = board.I2C()
