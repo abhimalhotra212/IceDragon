@@ -165,17 +165,17 @@ def set_waypoints():
 
     # starting coordinates
     #nodegps = vehicle.location.global_frame
-    lat1 = input("Enter starting latitude (float): ") #float(nodegps.lat)
-    lon1 = input("Enter starting longitude (float): ") #float(nodegps.lon)
-    alt1 = input("Enter starting altitude (float): ") #float(nodegps.alt)
+    lat1 = float(input("Enter starting latitude (float): ")) #float(nodegps.lat)
+    lon1 = float(input("Enter starting longitude (float): ")) #float(nodegps.lon)
+    alt1 = float(input("Enter starting altitude (float): ")) #float(nodegps.alt)
     # target coordinates
-    lat2 = input("Enter target latitude (float): ")
-    lon2 = input("Enter target longitude (float): ")
-    alt2 = input("Enter target altitude (float): ")
+    lat2 = float(input("Enter target latitude (float): "))
+    lon2 = float(input("Enter target longitude (float): "))
+    alt2 = float(input("Enter target altitude (float): "))
 
     # glide angle
-    glide = input("Enter optimal glide angle: ")
-    angle = glide * np.pi / 180 # convert degrees to radians
+    glide = float(input("Enter optimal glide angle: "))
+    angle = glide * (np.pi / 180.0) # convert degrees to radians
     # calculate distance [m] between starting and target location with Haversine Formula
     flat_dist = haversine_formula(lat1, lon1, lat2, lon2)
     # some trig
