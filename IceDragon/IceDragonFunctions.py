@@ -24,23 +24,28 @@ def uploadSounding():
     GPIO.setup(red, GPIO.OUT)
     GPIO.setup(green, GPIO.OUT)
 
-    file_path = "IceDragon/AntSoundingData.txt"
+    file_path1 = "IceDragon/sounding_file.txt"
+    file_path2 = "IceDragon/target_file.txt"
     GPIO.output(red, GPIO.HIGH) # turns on red LED
     time.sleep(2)
 
     # Check if the file exists
-    if os.path.exists(file_path):
+    if os.path.exists(file_path1):
         GPIO.output(red, GPIO.LOW) # turns off red LED
         GPIO.output(green, GPIO.HIGH) # turns on green LED
+        print("File already exists.")
     else:
+        print("File does not exist.")
         usb_drive_path = "/media/usb"  # Change to location where USB is actually mounted
 
         # List files in the USB drive
         usb_files = os.listdir(usb_drive_path)
         # Assuming there is only one file on the USB drive
         if usb_files:
-            source_file = os.path.join(usb_drive_path, usb_files[0])
-            shutil.copy(source_file, file_path)
+            source_file1 = os.path.join(usb_drive_path, usb_files[0])
+            source_file2 = os.path.join(usb_drive_path, usb_files[1])
+            shutil.copy(source_file1, file_path1)
+            shutil.copy(source_file2, file_path1)
             GPIO.output(red, GPIO.LOW) # turns off red LED
             GPIO.output(green, GPIO.HIGH) # turns on green LED
 
@@ -65,7 +70,7 @@ def getSoundingData(alt):
     current_alt = alt * 3.28084 # meters to ft
 
     #read sounding file and extract data
-    with open ("Dragonfly_Main/Waypoint_Select_Optimization/NASA_files/sounding.txt", "r") as f:
+    with open ("/media/usb/sounding_file.txt", "r") as f:
         
         next(f)
         winds_aloft = f.read().split('\n')
