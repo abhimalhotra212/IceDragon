@@ -164,6 +164,20 @@ def get_altitude_BME():
 
     time.sleep(1)
 
+'''
+function that will pull altitude from the GPS (when GPS data is available)
+'''
+def get_altitude_GPS(vehicle):
+    return vehicle.location.global_frame.altitude
+
+'''
+function that will pull altitude from the pressure reading 
+'''
+def get_altitude_pressure(vehicle):
+    #pressure
+    return 
+
+
 def haversine_formula(lat1, lon1, lat2, lon2):
     '''
     calculates distance between two lat/lon coordinates using Haversine Formula
@@ -334,5 +348,6 @@ def check_airspeed(vehicle):
 def get_acceleration(vehicle):
     return vehicle.acceleration
 
+def get_pressure(vehicle):
 
 

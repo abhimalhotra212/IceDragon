@@ -20,9 +20,14 @@ mounted = False
 glide = False
 loiter = False
 
+## Check for these before script runs and store them in variables ##
+#presure 
+#gpsData
+#airspeed
+
 while mounted:
     # will check airspeed and acceleration is not freefall then break
-    if (ice.get_airspeed(vehicle) > 100 or ice.get_acceleration(vehicle) < -9):
+    if (ice.get_airspeed(vehicle) > 3 or ice.get_acceleration(vehicle) < -9):
         mounted = False
         break
 
@@ -65,10 +70,10 @@ while glide:
     print("Commands uploaded") # delete after testing
 
     # Setting mode to execute mission
-    vehicle.Mode = ("AUTO")
+    vehicle.mode = ("AUTO")
 
     # check if we have lat long data, heating system is working etc. need to work on this function
-    ice.checkSystems()
+    #ice.checkSystems()
 
     # need to always be getting altititude and airspeed (if airspeed exceeds certain value, reduce climb angle)
 
@@ -85,7 +90,7 @@ while glide:
 while loiter:
     # explore guided mode; how to set value to loiter about
     # right now, Loiter means loiter around point where mode switched
-    vehicle.Mode = ("Loiter")
+    vehicle.mode = ("Loiter")
 
     # deploying chute if vehicle is ~3000 meters above ground level
     if ice.get_altitude(vehicle) < 3000:
