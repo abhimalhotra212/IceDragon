@@ -56,6 +56,31 @@ def uploadSounding():
     return
 
 
+def checkUpload():
+    GPIO.setmode(GPIO.BCM)
+    light = 27
+    GPIO.setup(light, GPIO.OUT)
+    
+    file_path1 = "IceDragon/sounding_file.txt"
+    file_path2 = "IceDragon/target_file.txt"
+
+    if os.path.exists(file_path1) & os.path.exists(file_path2):
+        GPIO.output(light, GPIO.HIGH) # turns on LED
+        print("Files already exist.")
+    else:
+        print("File does not exist.")
+        usb_drive_path = "/media/usb"  # Change to location where USB is actually mounted
+        usb_files = os.listdir(usb_drive_path) # List files in the USB drive
+        # Assuming there is only two files on the USB drive
+        if usb_files:
+            source_file1 = os.path.join(usb_drive_path, usb_files[0])
+            source_file2 = os.path.join(usb_drive_path, usb_files[1])
+            shutil.copy(source_file1, file_path1)
+            shutil.copy(source_file2, file_path1)
+            GPIO.output(light, GPIO.HIGH) # turns on LED
+
+    return
+
 def getSoundingData(alt):
     """
     getSoundingData - read and return all sounding data in an object variable
