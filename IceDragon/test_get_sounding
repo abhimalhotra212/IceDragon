@@ -1,2 +1,9 @@
 import IceDragonFunctions as ice
 
+
+altitude = 5000 # [m]
+windObject = ice.getSoundingData(altitude)
+print("speed = ", windObject.speed)
+print("direction = ", windObject.direction)
+print("closest altitude (ft) = " , windObject.height)
+
