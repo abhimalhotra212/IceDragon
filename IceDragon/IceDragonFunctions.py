@@ -9,6 +9,7 @@ import board
 import adafruit_bme680
 import os 
 import shutil
+import math
 
 def uploadSounding():
     """
@@ -171,11 +172,24 @@ def get_altitude_GPS(vehicle):
     return vehicle.location.global_frame.altitude
 
 '''
-function that will pull altitude from the pressure reading 
+function that will pull altitude from the pressure reading , will need current or drop altitude 
 '''
-def get_altitude_pressure(vehicle):
+def get_altitude_pressure(vehicle, pressure):
     #pressure
-    return 
+
+    # return GPS altitiude if we have GP data
+    if vehicle.gps_0.fix_type != 0:
+        return get_altitude_GPS(vehicle)
+
+
+    dropAltitude = 33528 # drop altitude in meters
+    R_a = 287.058 #J/(kg·K), universal gas constant of air
+    T_trop = 216.65 # troposphere temp in kelvin
+    g = 9.80665 # gravity constant (m/s^2)
+    P_S = 101.325 # pressure at sea level (kPa) (may need to be changed to pressure at troposphere as not clear in formula)
+    alt_trop = 11000
+    altitude = alt_trop + (R_a * T_trop / g) * math.log(pressure / P_S)
+    return altitude
 
 
 def haversine_formula(lat1, lon1, lat2, lon2):
