@@ -1,4 +1,4 @@
 import IceDragonFunctions as ice
 
-ice.checkUpload
+ice.checkUpload()
 
