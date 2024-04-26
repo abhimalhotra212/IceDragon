@@ -8,8 +8,8 @@ glide = True
 
 while glide:
     lat_wp, lon_wp, alt_wp, alt_above = ice.set_waypoints()
-    for i in range(0, len(lat_wp)):
-        print("Waypoint" , i + ":" , lat_wp[i] + lon_wp[i] + alt_wp[i])
+    #for i in range(0, len(lat_wp)):
+        #print(lat_wp[i], lon_wp[i], alt_wp[i])
     #cmds = vehicle.commands
     #cmds.clear()
 
