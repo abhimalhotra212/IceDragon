@@ -9,6 +9,7 @@ import board
 import adafruit_bme680
 import os 
 import shutil
+import math
 
 def uploadSounding():
     """
@@ -58,7 +59,7 @@ def uploadSounding():
 
 def checkUpload():
     GPIO.setmode(GPIO.BCM)
-    light = 22
+    light = 27
     GPIO.setup(light, GPIO.OUT)
     
     file_path1 = "IceDragon/sounding_file.txt"
@@ -170,17 +171,26 @@ function that will pull altitude from the GPS (when GPS data is available)
 def get_altitude_GPS(vehicle):
     return vehicle.location.global_frame.altitude
 
+def get_PT_pressure(vehicle):
+    print(vehicle.airspeed)
+# Create a message listener for pressure.
+    pressure = 0.0
+    @vehicle.on_message("SCALED_PRESSURE")
+    def listener(self, name, message):
+            pressure = float(message.press_abs)
+            return float(message.press_abs)
+
 '''
 function that will pull altitude from the pressure reading , will need current or drop altitude 
 '''
 def get_altitude_pressure(vehicle, pressure):
     #pressure
 
-    # return GPS altitiude if we have GP data
+    # return GPS altitiude if we have GPS data
     if vehicle.gps_0.fix_type != 0:
         return get_altitude_GPS(vehicle)
 
-
+    ## Calculates altitude in stratosphere
     dropAltitude = 33528 # drop altitude in meters
     R_a = 287.058 #J/(kg·K), universal gas constant of air
     T_trop = 216.65 # troposphere temp in kelvin
@@ -204,23 +214,23 @@ def haversine_formula(lat1, lon1, lat2, lon2):
     return c * r * 1000 # returns distance in meters
 
 
-def set_waypoints():
+def set_waypoints(vehicle):
     '''
     returns: 3 waypoints (lat, lon, alt), target (lat, lon, alt), and altitude above target where we begin loiter
     '''
 
     # starting coordinates using current GPS data
-    #nodegps = vehicle.location.global_frame
-    lat1 = float(-78.37268)#float(nodegps.lat)
-    lon1 = float(168.17298)#float(nodegps.lon)
-    alt1 = float(15000)#float(nodegps.alt), meters
+    nodegps = vehicle.location.global_frame
+    lat1 = float(nodegps.lat)
+    lon1 = float(nodegps.lon)
+    alt1 = float(nodegps.alt)
     # target coordinates (NEED TO UPLOAD DATA FROM FILE FOR TARGET!)
-    lat2 = float(-78.64606)
-    lon2 = float(137.51215)
-    alt2 = float(100)
+    lat2 = float(-109)
+    lon2 = float(30)
+    alt2 = float(300)
 
     # glide angle
-    glide = float(12)
+    glide = float(30)
     angle = glide * np.pi / 180 # convert degrees to radians
     # calculate distance [m] between starting and target location with Haversine Formula
     flat_dist = haversine_formula(lat1, lon1, lat2, lon2)
@@ -360,7 +370,3 @@ def check_airspeed(vehicle):
 
 def get_acceleration(vehicle):
     return vehicle.acceleration
-
-def get_pressure(vehicle):
-
-
