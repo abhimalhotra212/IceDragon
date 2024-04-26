@@ -158,31 +158,29 @@ def haversine_formula(lat1, lon1, lat2, lon2):
 
 def set_waypoints():
     '''
-    kayla's waypoint algorithm used here
-
     returns: 3 waypoints (lat, lon, alt), target (lat, lon, alt), and altitude above target where we begin loiter
     '''
 
-    # starting coordinates
+    # starting coordinates using current GPS data
     #nodegps = vehicle.location.global_frame
-    lat1 = float(input("Enter starting latitude (float): ")) #float(nodegps.lat)
-    lon1 = float(input("Enter starting longitude (float): ")) #float(nodegps.lon)
-    alt1 = float(input("Enter starting altitude (float): ")) #float(nodegps.alt)
-    # target coordinates
-    lat2 = float(input("Enter target latitude (float): "))
-    lon2 = float(input("Enter target longitude (float): "))
-    alt2 = float(input("Enter target altitude (float): "))
+    lat1 = float(-78.37268)#float(nodegps.lat)
+    lon1 = float(168.17298)#float(nodegps.lon)
+    alt1 = float(15000)#float(nodegps.alt), meters
+    # target coordinates (NEED TO UPLOAD DATA FROM FILE FOR TARGET!)
+    lat2 = float(-78.64606)
+    lon2 = float(137.51215)
+    alt2 = float(100)
 
     # glide angle
-    glide = float(input("Enter optimal glide angle: "))
-    angle = glide * (np.pi / 180.0) # convert degrees to radians
+    glide = float(12)
+    angle = glide * np.pi / 180 # convert degrees to radians
     # calculate distance [m] between starting and target location with Haversine Formula
     flat_dist = haversine_formula(lat1, lon1, lat2, lon2)
     # some trig
     delta_h = flat_dist * math.tan(angle)
     alt_above = alt1 - delta_h # altitude above target coords
 
-    # Waypoints
+    # Waypoints    
     lat_wp = []
     lon_wp = []
     alt_wp = []
@@ -190,8 +188,11 @@ def set_waypoints():
     for i in range(1, point_num + 1):
         ratio = i / (point_num + 1)
         lat = lat1 + ratio * (lat2 - lat1)
+        print(lat)
         lon = lon1 + ratio * (lon2 - lon1)
+        print(lon)
         alt = alt1 + ratio * (alt_above - alt1)
+        print(alt)
         lat_wp.append(lat)
         lon_wp.append(lon)
         alt_wp.append(alt)
