@@ -372,7 +372,7 @@ def get_acceleration(vehicle):
     return vehicle.acceleration
 
 def deploy_chute(vehicle):
-    pwm_value = 2000
+    pwm_value = 2200
     msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, pwm_value, 0,0,0,0,0)
     vehicle.send_maclink(msg)
 
