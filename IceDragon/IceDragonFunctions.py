@@ -171,17 +171,26 @@ function that will pull altitude from the GPS (when GPS data is available)
 def get_altitude_GPS(vehicle):
     return vehicle.location.global_frame.altitude
 
+def get_PT_pressure(vehicle):
+    print(vehicle.airspeed)
+# Create a message listener for pressure.
+    pressure = 0.0
+    @vehicle.on_message("SCALED_PRESSURE")
+    def listener(self, name, message):
+            pressure = float(message.press_abs)
+            return float(message.press_abs)
+
 '''
 function that will pull altitude from the pressure reading , will need current or drop altitude 
 '''
 def get_altitude_pressure(vehicle, pressure):
     #pressure
 
-    # return GPS altitiude if we have GP data
+    # return GPS altitiude if we have GPS data
     if vehicle.gps_0.fix_type != 0:
         return get_altitude_GPS(vehicle)
 
-
+    ## Calculates altitude in stratosphere
     dropAltitude = 33528 # drop altitude in meters
     R_a = 287.058 #J/(kg·K), universal gas constant of air
     T_trop = 216.65 # troposphere temp in kelvin
@@ -361,7 +370,3 @@ def check_airspeed(vehicle):
 
 def get_acceleration(vehicle):
     return vehicle.acceleration
-
-def get_pressure(vehicle):
-
-
