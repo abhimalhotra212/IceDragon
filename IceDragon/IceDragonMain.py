@@ -21,13 +21,14 @@ glide = False
 loiter = False
 
 ## Check for these before script runs and store them in variables ##
-#presure 
-#gpsData
-#airspeed
+presure = ice.get_PT_pressure
+gpsData = vehicle.location.global_frame
+airspeed = ice.check_airspeed(vehicle)
+groundAltitude = ice.get_altitude_GPS(vehicle)
 
 while mounted:
     # will check airspeed and acceleration is not freefall then break
-    if (ice.get_airspeed(vehicle) > 3 or ice.get_acceleration(vehicle) < -9):
+    if (ice.check_airspeed(vehicle) > 10 or ice.get_acceleration(vehicle) < -1200):
         mounted = False
         break
 
@@ -51,7 +52,7 @@ while deployed and glide == False:
     time.sleep(.1)
 
     # Need to check actual acceleration value
-    if (ice.get_acceleration(vehicle)[2] < -9):
+    if (ice.get_acceleration(vehicle)[2] < -1200):
             deployed = True
 
 

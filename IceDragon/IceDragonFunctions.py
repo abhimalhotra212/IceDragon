@@ -197,7 +197,7 @@ def get_altitude_pressure(vehicle, pressure):
     g = 9.80665 # gravity constant (m/s^2)
     P_S = 101.325 # pressure at sea level (kPa) (may need to be changed to pressure at troposphere as not clear in formula)
     alt_trop = 11000
-    altitude = alt_trop + (R_a * T_trop / g) * math.log(pressure / P_S)
+    altitude = alt_trop + (R_a * T_trop / g) * math.log((pressure * 6.89476) / P_S)
     return altitude
 
 
@@ -370,3 +370,9 @@ def check_airspeed(vehicle):
 
 def get_acceleration(vehicle):
     return vehicle.acceleration
+
+def deploy_chute(vehicle):
+    pwm_value = 2000
+    msg = vehicle.message_factory.command_long_encode(0, 0, mavutil.mavlink.MAV_CMD_DO_SET_SERVO, 0, 5, pwm_value, 0,0,0,0,0)
+    vehicle.send_maclink(msg)
+
