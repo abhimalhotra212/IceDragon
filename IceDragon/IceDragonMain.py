@@ -21,7 +21,7 @@ glide = False
 loiter = False
 
 ## Check for these before script runs and store them in variables ##
-presure = ice.get_PT_pressure
+groundPresure = ice.get_PT_pressure
 gpsData = vehicle.location.global_frame
 airspeed = ice.check_airspeed(vehicle)
 groundAltitude = ice.get_altitude_GPS(vehicle)
