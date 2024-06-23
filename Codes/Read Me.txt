@@ -1,0 +1,18 @@
+Purdue Ice Dragon Spring 2024
+Jump Start Codes
+
+There are two different jump start codes. 
+For both codes, the arduino that is FURTHER from the Purdue logo gets programed with these jump start codes.
+
+The purpose of the jump start code is to detect if the voltage on a part of the power distribution board is too low, and 
+it then "jumps" the voltage, bringing it up to what is it supposed to be.
+
+"JumpStart1" is the code that programs the arduino that is on-board the AIRCRAFT. This actually does the needed jump starting.
+"JumpStartGondola" programs the arduino on the gondola. This code does NOT do any jumping, and constantly has the jumpers off.
+Jump starting isn't needed on the gondola, since the power distribution board is only on the aircraft.
+
+IMPORTANT NOTE if changing the codes:
+Outputting the pins for the jumpstart as a 
+"1" means there is NO jumping. 
+"0" means there IS jumpstarting.
+Take note how it is flipped from what would be expected (this is due to the circuit design itself).
